@@ -1,17 +1,22 @@
+/**
+ * @jest-environment jsdom
+ */
+
+const fs = require('fs');
 const NewsView = require('../src/newsView.js');
 const NewsModel = require('../src/newsModel.js');
 jest.mock('../src/newsModel.js');
 
-let view, model;
+let view;
 
 describe('NewsView', () => {
   beforeEach(() => {
+    document.body.innerHTML = fs.readFileSync('./index.html');
     NewsModel.mockClear();
-    model = new NewsModel();
     mockClient = {
       getArticles: jest.fn()
     }
-    view = new NewsView(model, mockClient);
+    view = new NewsView(mockClient);
   })
 
   test('takes data from api and populates the model', () => {
@@ -33,9 +38,35 @@ describe('NewsView', () => {
 
     return view.loadArticles().then(() => {
       expect(view.articles.length).toBe(1);
-      expect(view.model.setHeadline).toHaveBeenCalledWith(mockData.response.results[0].webTitle);
-      expect(view.model.setArticleURL).toHaveBeenCalledWith(mockData.response.results[0].webUrl);
-      expect(view.model.setImageURL).toHaveBeenCalledWith(mockData.response.results[0].fields.thumbnail);
     })
+  })
+
+  test('newsView creates correct div blocks', async () => {
+    mockData = {
+      response: {
+        results: [{
+          webTitle: 'title',
+          webUrl: 'url',
+          fields: {
+            thumbnail: 'jpg'
+          }
+        }, {
+          webTitle: 'title 2',
+          webUrl: 'url 2',
+          fields: {
+            thumbnail: 'jpg 2'
+          }
+        }]
+      }
+    }
+
+    view.client.getArticles.mockImplementationOnce((url, callback) => {
+      return Promise.resolve(callback(mockData));
+    })
+
+    await view.loadArticles();
+    
+    expect(view.articles.length).toBe(2);
+    expect(document.querySelectorAll('.article').length).toBe(2);
   })
 })

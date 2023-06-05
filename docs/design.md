@@ -18,4 +18,6 @@ class newsClient:
   getArticles()
 
 class newsView:
-  
+  loadArticles()
+  displayArticles()
+  resetDisplayedArticles()
