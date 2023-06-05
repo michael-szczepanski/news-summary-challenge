@@ -5,6 +5,14 @@ class NewsView {
     this.client = client;
     this.articles = [];
     this.mainContainerEl = document.querySelector('#main-container');
+
+    this.searchQueryButton = document.querySelector('#search-query-button');
+    this.searchQueryButton.addEventListener('click', () => {
+      let query = document.querySelector('#search-query').value;
+      this.articles = [];
+      this.clearArticles();
+      this.loadArticles(query);
+    })
   }
 
   loadArticles(query) {
@@ -37,6 +45,10 @@ class NewsView {
       articleEl.append(articleHeadlineEl);
       this.mainContainerEl.append(articleEl);
     })
+  }
+
+  clearArticles() {
+    document.querySelectorAll('.article').forEach(article => article.remove())
   }
 }
 
