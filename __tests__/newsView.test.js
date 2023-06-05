@@ -1,17 +1,41 @@
 const NewsView = require('../src/newsView.js');
-require('jest-fetch-mock').enableMocks();
+const NewsModel = require('../src/newsModel.js');
+jest.mock('../src/newsModel.js');
 
-let view;
+let view, model;
 
 describe('NewsView', () => {
   beforeEach(() => {
-    fetch.resetMocks();
-    view = new NewsView();
+    NewsModel.mockClear();
+    model = new NewsModel();
+    mockClient = {
+      getArticles: jest.fn()
+    }
+    view = new NewsView(model, mockClient);
   })
 
-  describe('getArticles()', () => {
-    test('it retrieves correct data', () => {
-      
+  test('takes data from api and populates the model', () => {
+    mockData = {
+      response: {
+        results: [{
+          webTitle: 'title',
+          webUrl: 'url',
+          fields: {
+            thumbnail: 'jpg'
+          }
+        }]
+      }
+    }
+
+    view.client.getArticles.mockImplementationOnce((url, callback) => {
+      return Promise.resolve(callback(mockData));
+    })
+
+    return view.loadArticles().then(() => {
+      expect(view.articles.length).toBe(1);
+      expect(view.model.setHeadline).toHaveBeenCalledWith(mockData.response.results[0].webTitle);
+      expect(view.model.setArticleURL).toHaveBeenCalledWith(mockData.response.results[0].webUrl);
+      expect(view.model.setImageURL).toHaveBeenCalledWith(mockData.response.results[0].fields.thumbnail);
     })
   })
 })

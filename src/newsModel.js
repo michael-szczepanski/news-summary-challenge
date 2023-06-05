@@ -17,6 +17,14 @@ class NewsModel {
   getImageURL() { return this.imageURL; }
   getArticleURL() { return this.articleURL; }
   getSummary() { return this.summary; }
+
+  //
+  reset() {
+    this.headline = "";
+    this.imageURL = "";
+    this.articleURL = "";
+    this.summary = "";
+  }
 }
 
 module.exports = NewsModel;

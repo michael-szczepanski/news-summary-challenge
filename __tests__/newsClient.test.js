@@ -8,7 +8,7 @@ describe('NewsClient', () => {
   })
 
   test('getArticles', () => {
-    let url = 'https://content.guardianapis.com/search?api-key=test';
+    let url = 'https://content.guardianapis.com/search?&api-key=test&show-fields=thumbnail';
     return client.getArticles(url, (data) => {
       expect(data).toBeTruthy();
       expect(data.response.results.length).toBe(10);
